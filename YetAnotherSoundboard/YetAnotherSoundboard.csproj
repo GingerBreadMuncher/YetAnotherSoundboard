@@ -33,4 +33,8 @@
     </Resource>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PlaySound_API\PlaySound_API.csproj" />
+  </ItemGroup>
+
 </Project>

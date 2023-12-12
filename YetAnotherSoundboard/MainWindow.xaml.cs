@@ -10,30 +10,22 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using System;
 using System.Windows.Media;
+using PlaySound_API;
 
 namespace YetAnotherSoundboard
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+        private SoundProcessor soundProcessor;
+        private SoundLibrary soundLibrary;
+        
         public MainWindow()
         {
             InitializeComponent();
-            deviceEnumerator = new MMDeviceEnumerator();
-            audioDevices = new ObservableCollection<string>();
-            soundFilePaths = new Dictionary<string, int>();
-            PopulateAudioDevices();
+            soundProcessor = new SoundProcessor();
+            soundLibrary = new SoundLibrary();
         }
 
-        private WaveOutEvent outputDevice;
-        private AudioFileReader audioFile;
-        private MMDeviceEnumerator deviceEnumerator;
-        private ObservableCollection<string> audioDevices;
-        private Dictionary<string, int> soundFilePaths;
-        private string soundFilePath = "";
-        private int soundsActivated = 1;
 
         private void DragBorder_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -62,9 +54,8 @@ namespace YetAnotherSoundboard
 
         private void AddSound_Click(object sender, RoutedEventArgs e)
         {
-            int buttonColumn = Grid.GetColumn(AddSoundButton);
-            int buttonRow = Grid.GetRow(AddSoundButton);
-            buttonColumn++; buttonRow++;
+            int buttonColumn = Grid.GetColumn(AddSoundButton) + 1;
+            int buttonRow = Grid.GetRow(AddSoundButton) + 1;
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Title = "Select audio file...";
             fileDialog.DefaultExt = ".mp3";
@@ -72,6 +63,8 @@ namespace YetAnotherSoundboard
             bool? fileDiagSelected = fileDialog.ShowDialog();
             if (fileDiagSelected == true)
             {
+                SoundFile soundFile = new SoundFile("fileName", fileDialog.FileName);
+                soundLibrary.AddSoundFile(soundFile);
                 #region Generating a button
                 Button soundButton = new Button();
 
@@ -96,7 +89,7 @@ namespace YetAnotherSoundboard
                 soundPanel.Children.Add(soundImage);
                 soundPanel.Children.Add(soundText);
                 soundButton.Content = soundPanel;
-                soundButton.Click += Sound1_Click;
+                soundButton.Click += soundProcessor.PlaySound(soundFile);
 
                 Grid.SetRow(soundButton, buttonRow-1);
                 Grid.SetColumn(soundButton, buttonColumn-1);
@@ -106,7 +99,6 @@ namespace YetAnotherSoundboard
                 soundsActivated += 1;
                 Grid.SetColumn(AddSoundButton, buttonColumn);
                 #endregion
-                soundFilePath = fileDialog.FileName;
             }
             else { MessageBox.Show("File was not selected!", "Error", MessageBoxButton.OK); }
 
@@ -117,34 +109,6 @@ namespace YetAnotherSoundboard
             }
 
 
-        }
-
-        private void PopulateAudioDevices()
-        {
-            var devices = deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-            foreach (var device in devices)
-            {
-                //audioDevices.Add(device.FriendlyName);
-                inputList.Items.Add(device.FriendlyName);
-            }
-            inputList.SelectedIndex = 0;
-        }
-
-
-        private void Sound1_Click(object sender, RoutedEventArgs e)
-        {
-            if (outputDevice == null)
-            {
-                outputDevice = new WaveOutEvent();
-                outputDevice.DeviceNumber = inputList.SelectedIndex;
-                outputDevice.PlaybackStopped += OnPlaybackStopped;
-            }
-            if (audioFile == null)
-            {
-                audioFile = new AudioFileReader(soundFilePath);
-                outputDevice.Init(audioFile);
-                outputDevice.Play();
-            }
         }
 
         private void OnPlaybackStopped(object sender, StoppedEventArgs e)
