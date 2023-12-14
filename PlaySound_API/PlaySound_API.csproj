@@ -6,4 +6,8 @@
         <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="NAudio" Version="2.2.1" />
+    </ItemGroup>
+
 </Project>
