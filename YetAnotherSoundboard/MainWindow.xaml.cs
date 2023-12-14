@@ -97,7 +97,6 @@ namespace YetAnotherSoundboard
                 Grid.SetColumn(soundButton, buttonColumn-1);
                 grid.Children.Add(soundButton);
 
-                //soundFilePaths.Add(fileDialog.FileName, soundProcessor.soundsActivated);
                 soundProcessor.soundsActivated += 1;
                 Grid.SetColumn(AddSoundButton, buttonColumn);
                 #endregion
@@ -109,6 +108,8 @@ namespace YetAnotherSoundboard
                 Grid.SetRow(AddSoundButton, buttonRow);
                 Grid.SetColumn(AddSoundButton, 0);
             }
+            if (grid.RowDefinitions.Count <= buttonRow && buttonColumn >= grid.ColumnDefinitions.Count)
+            { AddSoundButton.Visibility = Visibility.Hidden; }
         }
 
         private void StopAudio_Click(object sender, RoutedEventArgs e) { soundProcessor.StopAudio(); }
