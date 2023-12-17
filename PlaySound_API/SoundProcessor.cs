@@ -12,12 +12,18 @@ public class SoundProcessor
     public ObservableCollection<string> audioDevices;
     public int soundsActivated = 1;
     public int deviceNumberIndex;
-    
+    public float volumeValue = 1;
+
     public SoundProcessor()
     {
         deviceEnumerator = new MMDeviceEnumerator();
         audioDevices = new ObservableCollection<string>();
         GetAudioDevices();
+    }
+
+    public void UpdateVolume(float soundVolume)
+    {
+        volumeValue = soundVolume;
     }
 
     public void UpdateDeviceNumber(int deviceNumber)
@@ -44,6 +50,7 @@ public class SoundProcessor
         if (audioFile == null)
         {
             audioFile = new AudioFileReader(soundFile.soundFilePath);
+            audioFile.Volume = volumeValue;
             outputDevice.Init(audioFile);
             outputDevice.Play();
         }

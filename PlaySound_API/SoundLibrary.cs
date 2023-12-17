@@ -14,5 +14,10 @@ public class SoundLibrary
         soundFiles.Add(soundFile);
     }
 
+    public void RemoveSoundFile(SoundFile soundFile)
+    {
+        soundFiles.Remove(soundFile);
+    }
+
     public SoundFile FindSoundFile(string fileName) => soundFiles.Find(x => x.soundName == fileName);
 }
