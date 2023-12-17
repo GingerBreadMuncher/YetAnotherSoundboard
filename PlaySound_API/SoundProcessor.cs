@@ -65,8 +65,20 @@ public class SoundProcessor
 
     public void PauseAudio()
     {
-        if (outputDevice?.PlaybackState == PlaybackState.Playing) { outputDevice.Pause(); }
-        else if (outputDevice?.PlaybackState == PlaybackState.Paused) { outputDevice.Play(); }
+        if(outputDevice == null) return;
+        switch (outputDevice.PlaybackState)
+        {
+            case PlaybackState.Playing:
+            {
+                outputDevice.Pause();
+                break;
+            }
+            case PlaybackState.Paused:
+            {
+                outputDevice.Play();
+                break;
+            }
+        }
     }
 
     public void StopAudio()
