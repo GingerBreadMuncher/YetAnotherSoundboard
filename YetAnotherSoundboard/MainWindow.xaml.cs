@@ -6,6 +6,8 @@ using System.Windows.Media.Imaging;
 using System;
 using System.Windows.Media;
 using PlaySound_API;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace YetAnotherSoundboard
 {
@@ -13,6 +15,7 @@ namespace YetAnotherSoundboard
     {
         private SoundProcessor soundProcessor;
         private SoundLibrary soundLibrary;
+        List<Button> buttons = new List<Button>();
 
         public MainWindow()
         {
@@ -22,6 +25,12 @@ namespace YetAnotherSoundboard
             inputList.SelectedIndex = 0;
             inputList.ItemsSource = soundProcessor.audioDevices;
             inputList.SelectionChanged += InputList_SelectionChanged;
+            volumeSlider.ValueChanged += OnVolumeChanged;
+        }
+
+        private void OnVolumeChanged(object sender, EventArgs e)
+        {
+            soundProcessor.UpdateVolume((float)volumeSlider.Value);
         }
 
         private void InputList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -69,6 +78,7 @@ namespace YetAnotherSoundboard
                 soundLibrary.AddSoundFile(soundFile);
                 #region Generating a button
                 Button soundButton = new Button();
+                buttons.Add(soundButton);
 
                 soundButton.Width = 150;
                 soundButton.Height = 150;
@@ -82,6 +92,7 @@ namespace YetAnotherSoundboard
                 soundImage.Height = 100;
                 soundImage.Width = 150;
                 TextBlock soundText = new TextBlock();
+                if (buttons.Count == 1) { soundProcessor.soundsActivated = 1; }
                 soundText.Text = "Sound " + soundProcessor.soundsActivated;
                 soundText.FontSize = 30;
                 soundText.FontWeight = FontWeights.SemiBold;
@@ -92,26 +103,68 @@ namespace YetAnotherSoundboard
                 soundPanel.Children.Add(soundText);
                 soundButton.Content = soundPanel;
                 soundButton.Click += (sender, e) => soundProcessor.PlaySound(soundFile);
+                #endregion
 
-                Grid.SetRow(soundButton, buttonRow-1);
-                Grid.SetColumn(soundButton, buttonColumn-1);
+                ContextMenu contextMenu = new ContextMenu();
+                MenuItem deleteMenuItem = new MenuItem();
+                deleteMenuItem.Header = "Delete";
+                deleteMenuItem.Click += (sender, e) =>
+                {
+                    soundLibrary.RemoveSoundFile(soundFile);
+                    grid.Children.Remove(soundButton);
+                    buttons.Remove(soundButton);
+                    if (AddSoundButton.Visibility == Visibility.Hidden) { AddSoundButton.Visibility = Visibility.Visible;}
+                    int soundButtonRow = Grid.GetRow(soundButton);
+                    if (!buttons.Any(b => Grid.GetRow(b) == soundButtonRow))
+                    {
+                        foreach (Button btn in buttons.Where(b => Grid.GetRow(b) > soundButtonRow))
+                        {
+                            Grid.SetRow(btn, Grid.GetRow(btn) - 1);
+                        }
+
+                        if (Grid.GetRow(AddSoundButton) > 2)
+                        {
+                            Grid.SetRow(AddSoundButton, Grid.GetRow(AddSoundButton) - 1);
+                        }
+                    }
+                    UpdateButtonPositions();
+                };
+                contextMenu.Items.Add(deleteMenuItem);
+                soundButton.ContextMenu = contextMenu;
+
+                Grid.SetRow(soundButton, buttonRow - 1);
+                Grid.SetColumn(soundButton, buttonColumn - 1);
                 grid.Children.Add(soundButton);
 
                 soundProcessor.soundsActivated += 1;
                 Grid.SetColumn(AddSoundButton, buttonColumn);
-                #endregion
-            }
-            else { MessageBox.Show("File was not selected!", "Error", MessageBoxButton.OK); }
 
-            if (buttonColumn >= grid.ColumnDefinitions.Count)
-            {
-                Grid.SetRow(AddSoundButton, buttonRow);
-                Grid.SetColumn(AddSoundButton, 0);
+                if (buttonColumn >= grid.ColumnDefinitions.Count)
+                {
+                    Grid.SetRow(AddSoundButton, buttonRow);
+                    Grid.SetColumn(AddSoundButton, 0);
+                }
+                if (grid.RowDefinitions.Count <= buttonRow && buttonColumn >= grid.ColumnDefinitions.Count)
+                {
+                    AddSoundButton.Visibility = Visibility.Hidden;
+                }
+
+
+                void UpdateButtonPositions()
+                {
+                    int columnCount = grid.ColumnDefinitions.Count;
+
+                    for (int i = 0; i < buttons.Count; i++)
+                    {
+                        Grid.SetColumn(buttons[i], i % columnCount);
+                        Grid.SetRow(buttons[i], 2 + i / columnCount);
+                    }
+
+                    Grid.SetColumn(AddSoundButton, buttons.Count % columnCount);
+                    Grid.SetRow(AddSoundButton, 2 + buttons.Count / columnCount);
+                }
             }
-            if (grid.RowDefinitions.Count <= buttonRow && buttonColumn >= grid.ColumnDefinitions.Count)
-            { AddSoundButton.Visibility = Visibility.Hidden; }
         }
-
         private void StopAudio_Click(object sender, RoutedEventArgs e) { soundProcessor.StopAudio(); }
 
         private void PauseAudio_Click(object sender, RoutedEventArgs e) { soundProcessor.PauseAudio(); }
