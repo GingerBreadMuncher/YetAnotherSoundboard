@@ -16,6 +16,7 @@ namespace YetAnotherSoundboard
         private SoundProcessor soundProcessor;
         private SoundLibrary soundLibrary;
         List<Button> buttons = new List<Button>();
+        private string soundTitle = "";
 
         public MainWindow()
         {
@@ -84,7 +85,8 @@ namespace YetAnotherSoundboard
                 soundButton.Height = 150;
                 soundButton.BorderThickness = new Thickness(0);
                 soundButton.Background = new SolidColorBrush(Colors.Transparent);
-                soundButton.Name = "Sound" + soundProcessor.soundsActivated;
+                soundTitle = "Sound" + soundProcessor.soundsActivated;
+                soundButton.Name = soundTitle;
 
                 StackPanel soundPanel = new StackPanel();
                 Image soundImage = new Image();
@@ -93,14 +95,46 @@ namespace YetAnotherSoundboard
                 soundImage.Width = 150;
                 TextBlock soundText = new TextBlock();
                 if (buttons.Count == 1) { soundProcessor.soundsActivated = 1; }
-                soundText.Text = "Sound " + soundProcessor.soundsActivated;
+                soundText.Text = soundTitle;
                 soundText.FontSize = 30;
                 soundText.FontWeight = FontWeights.SemiBold;
                 soundText.Foreground = Brushes.White;
                 soundText.HorizontalAlignment = HorizontalAlignment.Center;
                 soundText.VerticalAlignment = VerticalAlignment.Bottom;
+                TextBox renameBox = new TextBox();
+                renameBox.Visibility = Visibility.Hidden;
+                renameBox.Text = soundTitle;
+                renameBox.TextAlignment = TextAlignment.Center;
+                renameBox.VerticalContentAlignment = VerticalAlignment.Center;
+                renameBox.HorizontalAlignment = HorizontalAlignment.Center;
+                renameBox.Margin = new Thickness(0, -50, 0, 0);
+                renameBox.Height = 40;
+                renameBox.FontSize = 25;
+                renameBox.KeyDown += (sender, e) =>
+                {
+                    if (e.Key == Key.Enter)
+                    {
+                        soundTitle = renameBox.Text;
+                        soundText.Text = soundTitle;
+                        renameBox.Visibility = Visibility.Hidden;
+                        soundText.Visibility = Visibility.Visible;
+                    }
+                };
+                renameBox.TextChanged += (sender, e) =>
+                {
+                    double baseFontSize = 30;
+
+                    if (renameBox.Text.Length > 8)
+                    {
+                        soundText.FontSize = baseFontSize - renameBox.Text.Length + 4;
+                    }
+                    else { soundText.FontSize = baseFontSize; }
+                };
+                renameBox.MaxLength = 16;
+                renameBox.VerticalAlignment = VerticalAlignment.Center;
                 soundPanel.Children.Add(soundImage);
                 soundPanel.Children.Add(soundText);
+                soundPanel.Children.Add(renameBox);
                 soundButton.Content = soundPanel;
                 soundButton.Click += (sender, e) => soundProcessor.PlaySound(soundFile);
                 #endregion
@@ -131,6 +165,16 @@ namespace YetAnotherSoundboard
                 };
                 contextMenu.Items.Add(deleteMenuItem);
                 soundButton.ContextMenu = contextMenu;
+
+                
+                MenuItem renameSound = new MenuItem();
+                renameSound.Header = "Rename";
+                renameSound.Click += (sender, e) =>
+                {
+                    soundText.Visibility = Visibility.Hidden;
+                    renameBox.Visibility = Visibility.Visible;
+                };
+                contextMenu.Items.Add(renameSound);
 
                 Grid.SetRow(soundButton, buttonRow - 1);
                 Grid.SetColumn(soundButton, buttonColumn - 1);
