@@ -103,6 +103,8 @@ namespace YetAnotherSoundboard
                 soundText.VerticalAlignment = VerticalAlignment.Bottom;
                 TextBox renameBox = new TextBox();
                 renameBox.Visibility = Visibility.Hidden;
+                renameBox.Background = new SolidColorBrush(Colors.Transparent);
+                renameBox.Foreground = Brushes.White;
                 renameBox.Text = soundTitle;
                 renameBox.TextAlignment = TextAlignment.Center;
                 renameBox.VerticalContentAlignment = VerticalAlignment.Center;
@@ -119,14 +121,14 @@ namespace YetAnotherSoundboard
                         renameBox.Visibility = Visibility.Hidden;
                         soundText.Visibility = Visibility.Visible;
                     }
-                };
-                renameBox.TextChanged += (sender, e) =>
-                {
+
                     double baseFontSize = 30;
 
-                    if (renameBox.Text.Length > 8)
+                    if (soundText.Text.Length > 8)
                     {
                         soundText.FontSize = baseFontSize - renameBox.Text.Length + 4;
+                        double newMargin = renameBox.Text.Length;
+                        soundImage.Margin = new Thickness (0, -newMargin, 0, 0);
                     }
                     else { soundText.FontSize = baseFontSize; }
                 };
