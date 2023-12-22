@@ -7,9 +7,12 @@ namespace PlaySound_API;
 public class SoundProcessor
 {
     private WaveOutEvent outputDevice;
+    private WaveOutEvent listenerDevice;
     private AudioFileReader audioFile;
     private MMDeviceEnumerator deviceEnumerator;
+    public MMDevice defaultDevice;
     public ObservableCollection<string> audioDevices;
+    public bool listenerActivated = false;
     public int soundsActivated = 1;
     public int deviceNumberIndex;
     public float volumeValue = 1;
@@ -38,7 +41,9 @@ public class SoundProcessor
         {
             audioDevices.Add(device.FriendlyName);
         }
+        defaultDevice = deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
     }
+
     public void PlaySound(SoundFile soundFile)
     {
         if (outputDevice == null)
@@ -47,18 +52,32 @@ public class SoundProcessor
             outputDevice.DeviceNumber = deviceNumberIndex;
             outputDevice.PlaybackStopped += OnPlaybackStopped;
         }
+        if (listenerDevice == null)
+        {
+            listenerDevice = new WaveOutEvent();
+            listenerDevice.PlaybackStopped += OnPlaybackStopped;
+        }
         if (audioFile == null)
         {
             audioFile = new AudioFileReader(soundFile.soundFilePath);
             audioFile.Volume = volumeValue;
             outputDevice.Init(audioFile);
             outputDevice.Play();
+            if (listenerActivated)
+            {
+                var listenerAudioFile = new AudioFileReader(soundFile.soundFilePath);
+                listenerDevice.Init(listenerAudioFile);
+                listenerDevice.Play();
+            }
         }
     }
+
     private void OnPlaybackStopped(object sender, StoppedEventArgs e)
     {
         outputDevice?.Dispose();
         outputDevice = null;
+        listenerDevice?.Dispose();
+        listenerDevice = null;
         audioFile?.Dispose();
         audioFile = null;
     }
@@ -71,11 +90,13 @@ public class SoundProcessor
             case PlaybackState.Playing:
             {
                 outputDevice.Pause();
+                listenerDevice.Pause();
                 break;
             }
             case PlaybackState.Paused:
             {
                 outputDevice.Play();
+                if (listenerActivated & listenerDevice == null) {listenerDevice.Play();}
                 break;
             }
         }
