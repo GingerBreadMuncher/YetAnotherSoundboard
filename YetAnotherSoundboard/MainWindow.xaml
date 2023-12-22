@@ -23,6 +23,7 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
             <Border Grid.Row="0"
@@ -73,7 +74,7 @@
 
             </StackPanel>
 
-            <ComboBox Grid.Column="2"
+            <ComboBox Grid.Column="3"
                       x:Name="inputList"
                       Height="20"
                       Width="150"
@@ -91,13 +92,13 @@
                     Padding="15,0,0,0"
                     Click="StopAudio_Click">
                 <StackPanel Width="180">
-                    <Image Source="/Images/stop_icon_white.png" Width="40" HorizontalAlignment="Left"/>
+                    <Image Source="/Images/stop_icon_white.png" Width="40" Margin="10,0,0,0" HorizontalAlignment="Left"/>
                     <TextBlock Grid.Row="1"
                        Foreground="White"
                        Text="Stop Audio"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       Margin="45,-40,0,0"
+                       Margin="50,-40,0,0"
                        FontSize="20"/>
                 </StackPanel>
             </Button>
@@ -114,19 +115,42 @@
                     Padding="15,0,0,0"
                     Click="PauseAudio_Click">
                 <StackPanel Width="180">
-                    <Image Source="/Images/pause_icon_white.png" Width="40" HorizontalAlignment="Left"/>
+                    <Image Source="/Images/pause_icon_white.png" Width="40" Margin="10,0,0,0" HorizontalAlignment="Left"/>
                     <TextBlock Grid.Row="1"
                        Foreground="White"
                        Text="Pause Audio"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       Margin="45,-40,0,0"
+                       Margin="50,-40,0,0"
+                       FontSize="20"/>
+                </StackPanel>
+            </Button>
+
+            <Button x:Name="ListenerButton"
+                    Background="Transparent"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Width="200"
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    HorizontalContentAlignment="Left"
+                    HorizontalAlignment="Center"
+                    Padding="15,0,0,0"
+                    Click="ListenerButton_Click">
+                <StackPanel Width="180">
+                    <Image x:Name="ListenerImage" Source="/Images/audio_icon_white.png" Width="40" Margin="10,0,0,0" HorizontalAlignment="Left"/>
+                    <TextBlock x:Name="ListenerText" Grid.Row="1"
+                       Foreground="White"
+                       Text="Listener On"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       Margin="55,-40,0,0"
                        FontSize="20"/>
                 </StackPanel>
             </Button>
 
             <Slider x:Name="volumeSlider" VerticalAlignment="Center" Margin="10" 
-                       Grid.Column="3" Grid.Row="1" Value="1" Maximum="1" Minimum="0.02" 
+                       Grid.Column="4" Grid.Row="1" Value="1" Maximum="1" Minimum="0.02" 
                         TickFrequency="0.02" IsSnapToTickEnabled="True"/>
 
             <Button Grid.Row="2"

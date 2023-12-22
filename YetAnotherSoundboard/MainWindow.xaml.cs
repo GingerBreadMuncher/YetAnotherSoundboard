@@ -103,6 +103,8 @@ namespace YetAnotherSoundboard
                 soundText.VerticalAlignment = VerticalAlignment.Bottom;
                 TextBox renameBox = new TextBox();
                 renameBox.Visibility = Visibility.Hidden;
+                renameBox.Background = new SolidColorBrush(Colors.Transparent);
+                renameBox.Foreground = Brushes.White;
                 renameBox.Text = soundTitle;
                 renameBox.TextAlignment = TextAlignment.Center;
                 renameBox.VerticalContentAlignment = VerticalAlignment.Center;
@@ -119,14 +121,14 @@ namespace YetAnotherSoundboard
                         renameBox.Visibility = Visibility.Hidden;
                         soundText.Visibility = Visibility.Visible;
                     }
-                };
-                renameBox.TextChanged += (sender, e) =>
-                {
+
                     double baseFontSize = 30;
 
-                    if (renameBox.Text.Length > 8)
+                    if (soundText.Text.Length > 8)
                     {
                         soundText.FontSize = baseFontSize - renameBox.Text.Length + 4;
+                        double newMargin = renameBox.Text.Length;
+                        soundImage.Margin = new Thickness (0, -newMargin, 0, 0);
                     }
                     else { soundText.FontSize = baseFontSize; }
                 };
@@ -212,5 +214,21 @@ namespace YetAnotherSoundboard
         private void StopAudio_Click(object sender, RoutedEventArgs e) { soundProcessor.StopAudio(); }
 
         private void PauseAudio_Click(object sender, RoutedEventArgs e) { soundProcessor.PauseAudio(); }
+
+        private void ListenerButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (soundProcessor.listenerActivated) 
+            { 
+                soundProcessor.listenerActivated = false;
+                ListenerImage.Source = new BitmapImage(new Uri("/Images/audio_icon_white.png", UriKind.Relative));
+                ListenerText.Text = "Listener On";
+            }
+            else
+            {
+                soundProcessor.listenerActivated = true;
+                ListenerImage.Source = new BitmapImage(new Uri("/Images/no_audio_icon_white.png", UriKind.Relative));
+                ListenerText.Text = "Listener Off";
+            }
+        }
     }
 }

@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\audio_icon_white.png" />
+    <None Remove="Images\no_audio_icon_white.png" />
     <None Remove="Images\pause_icon_white.png" />
     <None Remove="Images\play_icon_white.png" />
     <None Remove="Images\plus_icon_white.png" />
@@ -19,6 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Images\audio_icon_white.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\no_audio_icon_white.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\pause_icon_white.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
